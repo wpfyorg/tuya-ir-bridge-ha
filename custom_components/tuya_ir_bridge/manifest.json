@@ -4,10 +4,10 @@
   "after_dependencies": [],
   "codeowners": [],
   "config_flow": true,
-  "documentation": "https://github.com/your-name/tuya-ir-bridge-ha",
+  "documentation": "https://github.com/wpfyorg/tuya-ir-bridge-ha",
   "integration_type": "hub",
   "iot_class": "cloud_push",
-  "issue_tracker": "https://github.com/your-name/tuya-ir-bridge-ha/issues",
+  "issue_tracker": "https://github.com/wpfyorg/tuya-ir-bridge-ha/issues",
   "requirements": [],
   "version": "0.1.0"
 }
