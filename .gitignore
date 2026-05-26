@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Home Assistant local/private state
+.storage/
+home-assistant*.db*
+home-assistant.log*
+secrets.yaml
+known_devices.yaml
+automations.yaml
+scripts.yaml
+scenes.yaml
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+
+# Local envs
+.env
+.venv/
+venv/

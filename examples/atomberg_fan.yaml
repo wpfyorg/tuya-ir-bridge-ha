@@ -1,0 +1,6 @@
+alias: Atomberg Fan Speed 3
+sequence:
+  - action: button.press
+    target:
+      entity_id: button.atomberg_fan_fan_speed3
+mode: single

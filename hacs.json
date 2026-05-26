@@ -1,0 +1,6 @@
+{
+  "name": "Tuya IR Bridge",
+  "render_readme": true,
+  "domains": ["climate", "button"],
+  "iot_class": "Cloud Polling"
+}

@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tuya IR Bridge",
+        "description": "Connect a Tuya Smart IR hub and optional saved IR remotes.",
+        "data": {
+          "name": "Name",
+          "region": "Tuya data center",
+          "client_id": "Client ID",
+          "client_secret": "Client secret",
+          "ir_hub_id": "IR hub device ID",
+          "ac_remote_id": "AC remote device ID",
+          "ac_name": "AC name",
+          "generic_remote_id": "Generic remote device ID",
+          "generic_remote_name": "Generic remote name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to Tuya Cloud or validate the provided IDs."
+    },
+    "abort": {
+      "already_configured": "This IR hub is already configured."
+    }
+  }
+}
