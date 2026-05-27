@@ -15,6 +15,9 @@ class TuyaIrApiError(Exception):
     """Raised when Tuya returns an unsuccessful response."""
 
 
+TOKEN_INVALID_CODES = {"1010", "1011", "1012", "1013", "1014"}
+
+
 class TuyaIrApi:
     """Small client for the Tuya Cloud infrared endpoints."""
 
@@ -39,7 +42,8 @@ class TuyaIrApi:
         response = await self._async_request("GET", "/v1.0/token?grant_type=1")
         result = response["result"]
         self._access_token = result["access_token"]
-        self._token_expires_at = int(time.time()) + int(result.get("expire_time", 3600))
+        expires_in = result.get("expire_time", result.get("expire", 3600))
+        self._token_expires_at = int(time.time()) + int(expires_in)
 
     async def async_get_ac_status(self, ir_hub_id: str, remote_id: str) -> dict[str, Any]:
         """Return the current cloud-side AC remote status."""
@@ -99,6 +103,24 @@ class TuyaIrApi:
         if self._token_expired(path):
             await self.async_get_access_token()
 
+        data = await self._async_send(method, path, body)
+        if not data.get("success") and self._is_token_invalid(data, path):
+            self._access_token = ""
+            self._token_expires_at = 0
+            await self.async_get_access_token()
+            data = await self._async_send(method, path, body)
+
+        if not data.get("success"):
+            raise TuyaIrApiError(
+                f"Tuya API error for {method} {path}: "
+                f"{data.get('code')} {data.get('msg')}"
+            )
+        return data
+
+    async def _async_send(
+        self, method: str, path: str, body: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Send a signed request without refresh/retry handling."""
         body_text = json.dumps(body, separators=(",", ":")) if body is not None else ""
         timestamp = str(int(time.time() * 1000))
         headers = self._headers(method, path, timestamp, body_text)
@@ -109,19 +131,17 @@ class TuyaIrApi:
             headers=headers,
             data=body_text or None,
         ) as response:
-            data = await response.json()
-
-        if not data.get("success"):
-            raise TuyaIrApiError(
-                f"Tuya API error for {method} {path}: "
-                f"{data.get('code')} {data.get('msg')}"
-            )
-        return data
+            return await response.json()
 
     def _token_expired(self, path: str) -> bool:
         if path.startswith("/v1.0/token"):
             return False
         return not self._access_token or int(time.time()) > self._token_expires_at - 30
+
+    def _is_token_invalid(self, data: dict[str, Any], path: str) -> bool:
+        if path.startswith("/v1.0/token"):
+            return False
+        return str(data.get("code")) in TOKEN_INVALID_CODES
 
     def _headers(
         self, method: str, path: str, timestamp: str, body_text: str
